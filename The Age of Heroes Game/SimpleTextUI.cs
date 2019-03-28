@@ -8,7 +8,8 @@ namespace A1r.SimpleTextUI
     {
         Left,
         Right,
-        Center
+        Center,
+        LowerLeft
     }
 
     public enum Direction
@@ -322,8 +323,13 @@ namespace A1r.SimpleTextUI
                         item.Position.X -= item.Size.X + Width;
                         mtext.TextPosition = new Vector2(pos.X - mtext.TextSize.X, pos.Y);
                     }
+                    else if (align == Alignment.LowerLeft)
+                    {
+                        item.Position.X -= item.Size.X + Width;
+                        mtext.TextPosition = new Vector2(pos.X + Width, (pos.Y + 1150));
+                    }
                     else
-                        mtext.TextPosition = new Vector2(pos.X + Width, pos.Y);
+                        mtext.TextPosition = new Vector2(pos.X + Width, pos.Y );
                 }
                 else
                 {
@@ -331,6 +337,8 @@ namespace A1r.SimpleTextUI
                         item.Position.X -= item.Size.X / 2;
                     else if (align == Alignment.Right)
                         item.Position.X -= item.Size.X + selsize;
+                    else if (align == Alignment.LowerLeft)
+                        item.Position.X += selsize;
                     else
                         item.Position.X += selsize;
                 }

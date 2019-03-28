@@ -174,7 +174,7 @@ namespace The_Age_of_Heroes_Game
             {
                 TextColor = Color.Black,
                 SelectedElement = new TextElement(">", Color.White),
-                Align = Alignment.Left
+                Align = Alignment.LowerLeft
             };
 
             options = new SimpleTextUI(this, big, new TextElement[]
@@ -203,7 +203,7 @@ namespace The_Age_of_Heroes_Game
             // texture for coin ojects, blank once collected
             coinTexture = Content.Load<Texture2D>("coinTexture");
             blankTexture = Content.Load<Texture2D>("Transparent");
-            menuBackground = Content.Load<Texture2D>("nippon_sample");
+            menuBackground = Content.Load<Texture2D>("Age Of Heroes Menu");
 
             // get coin count
             int coinCount = Convert.ToInt32(map.ObjectGroups["Objects"].Properties["Coin_Count"]);
@@ -428,7 +428,7 @@ namespace The_Age_of_Heroes_Game
         /// 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Red);
+            GraphicsDevice.Clear(Color.SkyBlue);
             
             // if the game is playing
             if(currentScreen==Menu.Play)
