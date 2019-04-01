@@ -45,6 +45,7 @@
     <Compile Include="Content\Models\Animation.cs" />
     <Compile Include="Content\Models\Input.cs" />
     <Compile Include="Content\Sprites\Enemy.cs" />
+    <Compile Include="Content\Sprites\Projectile.cs" />
     <Compile Include="Content\Sprites\Sprite.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Program.cs" />
@@ -63,9 +64,9 @@
     <Content Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <MonoGameContentReference Include="Content\Content.mgcb">
+    <Content Include="Content\Content.mgcb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </MonoGameContentReference>
+    </Content>
     <None Include="app.manifest" />
     <Content Include="Content\SimpleRPG.tmx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
