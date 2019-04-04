@@ -32,6 +32,7 @@ namespace The_Age_of_Heroes_Game
         private readonly Texture2D keyTexture;
         List<Squared.Tiled.Object> Inventory;
         public List<Enemy> EnemyList;
+        //public List<Projectile> PlayerProjectiles;
         int coin_collected = 0;
         SimpleTextUI menu;
         SimpleTextUI inventory;
@@ -200,10 +201,11 @@ namespace The_Age_of_Heroes_Game
             // timer to control use of exits
             exittimer = new Timer();
 
-            // texture for coin ojects, blank once collected
+                        // texture for coin ojects, blank once collected
             coinTexture = Content.Load<Texture2D>("coinTexture");
             blankTexture = Content.Load<Texture2D>("Transparent");
             menuBackground = Content.Load<Texture2D>("Age Of Heroes Menu");
+            
 
             // get coin count
             int coinCount = Convert.ToInt32(map.ObjectGroups["Objects"].Properties["Coin_Count"]);
@@ -297,7 +299,6 @@ namespace The_Age_of_Heroes_Game
                     sprite.Update(gameTime, Position, Test);
                     sprite.Position = new Vector2(map.ObjectGroups["Objects"].Objects["Player"].X, map.ObjectGroups["Objects"].Objects["Player"].Y);
                 }
-
                 // update each enemy
                 int i = 1;
                 foreach (Enemy E in EnemyList)
@@ -421,6 +422,7 @@ namespace The_Age_of_Heroes_Game
             exittimer.Enabled = false;
         }
 
+
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
@@ -443,6 +445,7 @@ namespace The_Age_of_Heroes_Game
                 {
                     sprite.Draw(spriteBatch, viewportPosition + new Vector2(0, 100) - new Vector2((graphics.PreferredBackBufferWidth / 2), (graphics.PreferredBackBufferHeight / 2)));
                 }
+
 
                 // draw each enemy
                 foreach (Enemy sprite in EnemyList)
@@ -485,6 +488,10 @@ namespace The_Age_of_Heroes_Game
                 scrolly = 1;
             if (keyState.IsKeyDown(Keys.Down))
                 scrolly = -1;
+            if(keyState.IsKeyDown(Keys.Space))
+            {
+                _sprites[0].Fire(viewportPosition);
+            }
 
             // get game pad input
             scrollx += (int)gamePadState.ThumbSticks.Left.X;

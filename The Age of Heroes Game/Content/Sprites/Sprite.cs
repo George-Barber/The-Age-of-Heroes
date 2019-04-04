@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using The_Age_of_Heroes_Game.Content.Manager;
+using System.Timers;
 using The_Age_of_Heroes_Game.Content.Models;
 
 namespace The_Age_of_Heroes_Game.Content.Sprites
@@ -22,8 +23,10 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
         public int Health;
         public int HealthMax;
 
+        Timer firetimer;
+        public List<Projectile> PlayerProjectiles;
         public float Speed = 1f;
-        public Vector2 Velocity;
+        public Vector2 Velocity,OldVelocity;
         #endregion
         #region Properties
         public Input Input;
@@ -39,6 +42,24 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
 
                 if (_animationManager != null)
                     _animationManager.Position = _position;
+            }
+        }
+        private void OnFireTimedEvent(object source, ElapsedEventArgs e)
+        {
+            firetimer.Enabled = false;
+        }
+        public void Fire(Vector2 viewportPosition)
+        {
+            if (!firetimer.Enabled)
+            {
+                
+                Projectile Temp = new Projectile(_texture, viewportPosition,OldVelocity);
+                PlayerProjectiles.Add(Temp);
+                firetimer = new Timer();
+                firetimer.Interval = 500;
+                firetimer.Elapsed += new ElapsedEventHandler(OnFireTimedEvent);
+                Console.WriteLine("projectile fired");
+                firetimer.Enabled = true;
             }
         }
 
@@ -77,7 +98,11 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
 
                 }
             }
-            else throw new Exception("DRAW ERROR!!!");
+            if(PlayerProjectiles!=null)
+                foreach (var sprite in PlayerProjectiles)
+                {
+                    sprite.Draw(spriteBatch, vp , true);
+                }
 
         }
         
@@ -104,17 +129,19 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
                 HealthMax = 5;
                 HealthBar = new Rectangle(0, 0, 27/HealthMax*Health, 5);
             }
-
+            PlayerProjectiles = new List<Projectile>();
             // setup animations
             _animations = animations;
             _animationManager = new AnimationManager(_animations.First().Value);
-             
+            firetimer = new Timer();
         }
 
         // second constructor for if the sprite is a single texture
         public Sprite(Texture2D texture)
         {
             _texture = texture;
+            firetimer = new Timer();
+            PlayerProjectiles = new List<Projectile>();
         }
 
         // update method for the sprite
@@ -134,7 +161,7 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
             // only update animation if sprite is moving
             if (Velocity != Vector2.Zero)
                 _animationManager.Update(gameTime);
-
+            OldVelocity = Velocity;
             Velocity = Vector2.Zero;
         }
 
