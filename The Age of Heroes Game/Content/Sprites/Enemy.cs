@@ -16,7 +16,7 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
     public class Enemy : Sprite
     {
         // constructor to pass everything to sprite bas class
-        public Enemy(Dictionary<string, Animation> animations2, bool health) : base(animations2, health)
+        public Enemy(Dictionary<string, Animation> animations2, bool health) : base(animations2, health,null)
         {
 
         }
@@ -90,6 +90,18 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
             else
             {
                 Velocity = Vector2.Zero;
+            }
+
+            OldVelocity = Velocity;
+
+            int projcount = 0;
+            foreach (Projectile proj in PlayerProjectiles)
+            {
+                if (proj.active)
+                {
+                    proj.Update(gameTime);
+                }
+                projcount++;
             }
 
             // set animations for the enemy

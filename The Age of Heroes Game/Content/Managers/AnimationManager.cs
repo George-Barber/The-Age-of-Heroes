@@ -44,6 +44,8 @@ namespace The_Age_of_Heroes_Game.Content.Manager
                                           _animation.FrameWidth,
                                           _animation.FrameHeight), 
                             Color.White);
+
+            Console.WriteLine("sprite position: " + (Position - vp));
         }
 
         // start animation

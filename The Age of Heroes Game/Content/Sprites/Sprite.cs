@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using The_Age_of_Heroes_Game.Content.Manager;
 using System.Timers;
 using The_Age_of_Heroes_Game.Content.Models;
+using Squared.Tiled;
 
 namespace The_Age_of_Heroes_Game.Content.Sprites
 {
@@ -18,7 +19,7 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
         protected AnimationManager _animationManager;
         protected Dictionary<string, Animation> _animations;
         protected Vector2 _position;
-        protected Texture2D _texture, healthtexture;
+        protected Texture2D _texture,projtexture, healthtexture;
         public Rectangle HealthBar;
         public int Health;
         public int HealthMax;
@@ -48,18 +49,22 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
         {
             firetimer.Enabled = false;
         }
-        public void Fire(Vector2 viewportPosition)
+        public bool Fire(Vector2 Position, Squared.Tiled.Object obj, Texture2D blank )
         {
             if (!firetimer.Enabled)
             {
                 
-                Projectile Temp = new Projectile(_texture, viewportPosition,OldVelocity);
+                Projectile Temp = new Projectile(projtexture, blank, Position,OldVelocity*5,obj);
                 PlayerProjectiles.Add(Temp);
                 firetimer = new Timer();
                 firetimer.Interval = 500;
                 firetimer.Elapsed += new ElapsedEventHandler(OnFireTimedEvent);
-                Console.WriteLine("projectile fired");
                 firetimer.Enabled = true;
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -98,11 +103,6 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
 
                 }
             }
-            if(PlayerProjectiles!=null)
-                foreach (var sprite in PlayerProjectiles)
-                {
-                    sprite.Draw(spriteBatch, vp , true);
-                }
 
         }
         
@@ -120,7 +120,7 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
         }
 
         // constructor for sprite, run when a sprite is created
-        public Sprite(Dictionary<string, Animation> animations, bool health)
+        public Sprite(Dictionary<string, Animation> animations, bool health,Texture2D proj)
         {
             // setup health
             if (health)
@@ -134,14 +134,18 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
             _animations = animations;
             _animationManager = new AnimationManager(_animations.First().Value);
             firetimer = new Timer();
+            if (proj != null)
+                projtexture = proj;
         }
 
         // second constructor for if the sprite is a single texture
-        public Sprite(Texture2D texture)
+        public Sprite(Texture2D texture, Texture2D proj)
         {
             _texture = texture;
             firetimer = new Timer();
             PlayerProjectiles = new List<Projectile>();
+            if (proj != null)
+                projtexture = proj;
         }
 
         // update method for the sprite
@@ -163,6 +167,17 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
                 _animationManager.Update(gameTime);
             OldVelocity = Velocity;
             Velocity = Vector2.Zero;
+
+            int projcount = 0;
+            foreach (Projectile proj in PlayerProjectiles)
+            {
+                if (proj.active)
+                {
+                    proj.Update(gameTime);
+                }
+                projcount++;
+            }
+
         }
 
         protected virtual void SetAnimations()

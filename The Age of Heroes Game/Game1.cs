@@ -42,6 +42,7 @@ namespace The_Age_of_Heroes_Game
         SpriteFont small;
         Timer keytimer;
         Timer exittimer;
+        int projcount = 0;
 
         // property to handle changing maps
         public Map CurrentMap
@@ -122,6 +123,11 @@ namespace The_Age_of_Heroes_Game
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            // texture for coin ojects, blank once collected
+            coinTexture = Content.Load<Texture2D>("coinTexture");
+            blankTexture = Content.Load<Texture2D>("Transparent");
+            menuBackground = Content.Load<Texture2D>("Age Of Heroes Menu");
+
             // set and load maps
             map1 = Map.Load(Path.Combine(Content.RootDirectory, "SimpleRPG.tmx"), Content);
             map2 = Map.Load(Path.Combine(Content.RootDirectory, "SimpleRPG.tmx"), Content);
@@ -152,7 +158,7 @@ namespace The_Age_of_Heroes_Game
             // create list of sprites for player
             _sprites = new List<Sprite>()
             {
-                new Sprite(animations,true)
+                new Sprite(animations,true,coinTexture)
                 {
                     Position = new Vector2(100, 100),
                     Input = new Input()
@@ -201,10 +207,6 @@ namespace The_Age_of_Heroes_Game
             // timer to control use of exits
             exittimer = new Timer();
 
-                        // texture for coin ojects, blank once collected
-            coinTexture = Content.Load<Texture2D>("coinTexture");
-            blankTexture = Content.Load<Texture2D>("Transparent");
-            menuBackground = Content.Load<Texture2D>("Age Of Heroes Menu");
             
 
             // get coin count
@@ -258,7 +260,22 @@ namespace The_Age_of_Heroes_Game
         /// checking for collisions, gathering input, and playing audio.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        
+        private void clean()
+        {
+            List<KeyValuePair<string, Squared.Tiled.Object>> dellist = new List<KeyValuePair<string, Squared.Tiled.Object>>();
+            foreach (KeyValuePair <string,Squared.Tiled.Object> o in map.ObjectGroups["Objects"].Objects)
+            {
+                if(o.Value.Texture==blankTexture && o.Value.Type=="proj")
+                {
+                    dellist.Add(o);
+                }
+            }
+            if(dellist.Count>0)
+                foreach (KeyValuePair<string, Squared.Tiled.Object> o in dellist)
+                {
+                    map.ObjectGroups["Objects"].Objects.Remove(o.Key);
+                }
+        }
 
         protected override void Update(GameTime gameTime)
         {
@@ -266,7 +283,7 @@ namespace The_Age_of_Heroes_Game
             {
                 if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                     Exit();
-
+                clean();
                 // get player input
                 GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
                 KeyboardState keyState = Keyboard.GetState();
@@ -314,13 +331,28 @@ namespace The_Age_of_Heroes_Game
                     {
                         // collision so set position back to temp value
                         E.Position = temp;
-                        Console.WriteLine("Enemy collision");
                     }
                     else
                     {
                         // no collision so update the enemy position in map
                         map.ObjectGroups["Objects"].Objects["Enemy" + i].X = (int)E.Position.X;
                         map.ObjectGroups["Objects"].Objects["Enemy" + i].Y = (int)E.Position.Y;
+
+                        if (true)
+                        {
+                            Squared.Tiled.Object tempp = new Squared.Tiled.Object();
+                            tempp.X = (int)E.Position.X;
+                            tempp.Y = (int)E.Position.Y;
+                            tempp.Width = 30;
+                            tempp.Height = 30;
+                            tempp.Type = "proj";
+                            tempp.Texture = coinTexture;
+                            if (E.Fire(E.Position, tempp, blankTexture))
+                            {
+                                map.ObjectGroups["Objects"].Objects.Add("proj" + projcount, tempp);
+                                projcount++;
+                            }
+                        }
                     }
                     i++;
                 }
@@ -490,7 +522,21 @@ namespace The_Age_of_Heroes_Game
                 scrolly = -1;
             if(keyState.IsKeyDown(Keys.Space))
             {
-                _sprites[0].Fire(viewportPosition);
+                Squared.Tiled.Object temp = new Squared.Tiled.Object();
+                temp.X = (int)Position.X;
+                temp.Y = (int)Position.Y;
+                temp.Width = 30;
+                temp.Height = 30;
+                temp.Texture = coinTexture;
+                temp.Type = "proj";
+
+                
+                if (_sprites[0].Fire(Position, temp, blankTexture))
+                {
+                    map.ObjectGroups["Objects"].Objects.Add("proj" + projcount, temp);
+                    projcount++;
+                }
+
             }
 
             // get game pad input
@@ -516,10 +562,12 @@ namespace The_Age_of_Heroes_Game
                 obj.Height
                 );
 
+            int startx = ((int)obj.X / 16)-5;
+            int starty = ((int)obj.Y / 16) - 5;
             // cycles through each tile on the map
-            for (int x = 0; x < map.Width; x++)
+            for (int x =startx; x <startx+10; x++)
             {
-                for (int y = 0; y < map.Height; y++)
+                for (int y = starty; y < starty+10; y++)
                 {
                     // if the tile is in the collision layer
                     if (collision.GetTile(x, y) != 0)
