@@ -28,6 +28,7 @@ namespace The_Age_of_Heroes_Game
         private List<Sprite> _sprites;
         private Texture2D blankTexture;
         private Texture2D coinTexture;
+        private Texture2D projTexture;
         private Texture2D menuBackground;
         private readonly Texture2D keyTexture;
         List<Squared.Tiled.Object> Inventory;
@@ -125,6 +126,7 @@ namespace The_Age_of_Heroes_Game
 
             // texture for coin ojects, blank once collected
             coinTexture = Content.Load<Texture2D>("coinTexture");
+            projTexture = Content.Load<Texture2D>("Magic");
             blankTexture = Content.Load<Texture2D>("Transparent");
             menuBackground = Content.Load<Texture2D>("Age Of Heroes Menu");
 
@@ -158,7 +160,7 @@ namespace The_Age_of_Heroes_Game
             // create list of sprites for player
             _sprites = new List<Sprite>()
             {
-                new Sprite(animations,true,coinTexture)
+                new Sprite(animations,true,projTexture)
                 {
                     Position = new Vector2(100, 100),
                     Input = new Input()
@@ -346,7 +348,7 @@ namespace The_Age_of_Heroes_Game
                             tempp.Width = 30;
                             tempp.Height = 30;
                             tempp.Type = "proj";
-                            tempp.Texture = coinTexture;
+                            tempp.Texture = projTexture;
                             if (E.Fire(E.Position, tempp, blankTexture))
                             {
                                 map.ObjectGroups["Objects"].Objects.Add("proj" + projcount, tempp);
@@ -527,7 +529,7 @@ namespace The_Age_of_Heroes_Game
                 temp.Y = (int)Position.Y;
                 temp.Width = 30;
                 temp.Height = 30;
-                temp.Texture = coinTexture;
+                temp.Texture = projTexture;
                 temp.Type = "proj";
 
                 
