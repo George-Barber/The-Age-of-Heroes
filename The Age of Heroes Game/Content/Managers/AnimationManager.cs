@@ -18,9 +18,9 @@ namespace The_Age_of_Heroes_Game.Content.Manager
 
         public int CurrentFrame { get; set; }
         public int FrameCount { get; private set; }
-        public int FrameHeight { get { return Texture.Height; } }
+        public int FrameHeight { get { return _animation.FrameHeight; } }
         public float FrameSpeed { get; set; }
-        public int FrameWidth { get { return Texture.Width / FrameCount; } }
+        public int FrameWidth { get { return _animation.FrameWidth; } }
         public bool IsLooping { get; set; }
         public Texture2D Texture { get; private set; }
         private Animation _animation;

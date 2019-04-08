@@ -77,7 +77,7 @@ namespace The_Age_of_Heroes_Game
                 };
                 for (int i = 1; i <= EnemyCount; i++)
                 {
-                    Enemy temp = new Enemy(animations2, true);
+                    Enemy temp = new Enemy(animations2, true, map.ObjectGroups["Objects"].Objects["Enemy" + i]);
                     temp.Position = new Vector2(map.ObjectGroups["Objects"].Objects["Enemy" + i].X, map.ObjectGroups["Objects"].Objects["Enemy" + i].Y);
                     EnemyList.Add(temp);
                 }
@@ -160,7 +160,7 @@ namespace The_Age_of_Heroes_Game
             // create list of sprites for player
             _sprites = new List<Sprite>()
             {
-                new Sprite(animations,true,projTexture)
+                new Sprite(animations,true,projTexture, false)
                 {
                     Position = new Vector2(100, 100),
                     Input = new Input()
@@ -230,7 +230,7 @@ namespace The_Age_of_Heroes_Game
             for (int i = 1; i <= EnemyCount; i++)
             {
                 //create a temp enemy
-                Enemy temp = new Enemy(animations2, true);
+                Enemy temp = new Enemy(animations2, true, map.ObjectGroups["Objects"].Objects["Enemy" + i]);
                 temp.Position = new Vector2(map.ObjectGroups["Objects"].Objects["Enemy" + i].X, map.ObjectGroups["Objects"].Objects["Enemy" + i].Y);
 
                 // add temp enemy to list
@@ -316,6 +316,21 @@ namespace The_Age_of_Heroes_Game
                 foreach (var sprite in _sprites)
                 {
                     sprite.Update(gameTime, Position, Test);
+                    foreach(Projectile P in sprite.PlayerProjectiles)
+                    {
+                        Rectangle proj = new Rectangle((int)P.Position.X, (int)P.Position.Y, P.mapobj.Width, P.mapobj.Height);
+                        foreach (Enemy E in EnemyList)
+                        {
+                            Rectangle Erec = new Rectangle((int)E.mapobj.X, (int)E.mapobj.Y, E.mapobj.Width, E.mapobj.Height);
+                            if (proj.Intersects(Erec) && P.active)
+                            {
+                                E.Health -= 1;
+                                P.mapobj.Texture= P.Blank;
+                                P.active = false;
+                                Console.WriteLine("shot: " + proj + " -- " + Erec + " -- " + E.Health);
+                            }
+                        }
+                    }
                     sprite.Position = new Vector2(map.ObjectGroups["Objects"].Objects["Player"].X, map.ObjectGroups["Objects"].Objects["Player"].Y);
                 }
                 // update each enemy

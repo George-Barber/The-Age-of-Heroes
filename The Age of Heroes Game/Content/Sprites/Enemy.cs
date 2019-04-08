@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using The_Age_of_Heroes_Game.Content.Manager;
 using The_Age_of_Heroes_Game.Content.Models;
+using Squared.Tiled;
 
 
 namespace The_Age_of_Heroes_Game.Content.Sprites
@@ -15,10 +16,11 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
     // enemy is a class of sprite
     public class Enemy : Sprite
     {
+        public Squared.Tiled.Object mapobj;
         // constructor to pass everything to sprite bas class
-        public Enemy(Dictionary<string, Animation> animations2, bool health) : base(animations2, health,null)
+        public Enemy(Dictionary<string, Animation> animations2, bool health, Squared.Tiled.Object obj) : base(animations2, health,null, true)
         {
-
+            mapobj = obj;
         }
 
         // set enemy animations

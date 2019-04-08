@@ -16,13 +16,14 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
     public class Sprite
     {
         #region Fields
-        protected AnimationManager _animationManager;
+        public AnimationManager _animationManager;
         protected Dictionary<string, Animation> _animations;
         protected Vector2 _position;
         protected Texture2D _texture,projtexture, healthtexture;
         public Rectangle HealthBar;
         public int Health;
         public int HealthMax;
+        public bool enemy;
 
         Timer firetimer;
         public List<Projectile> PlayerProjectiles;
@@ -54,7 +55,7 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
             if (!firetimer.Enabled)
             {
                 
-                Projectile Temp = new Projectile(projtexture, blank, Position,OldVelocity*5,obj);
+                Projectile Temp = new Projectile(projtexture, blank, Position,OldVelocity*5,obj, false);
                 PlayerProjectiles.Add(Temp);
                 firetimer = new Timer();
                 firetimer.Interval = 500;
@@ -120,7 +121,7 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
         }
 
         // constructor for sprite, run when a sprite is created
-        public Sprite(Dictionary<string, Animation> animations, bool health,Texture2D proj)
+        public Sprite(Dictionary<string, Animation> animations, bool health,Texture2D proj, bool en)
         {
             // setup health
             if (health)
@@ -136,6 +137,7 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
             firetimer = new Timer();
             if (proj != null)
                 projtexture = proj;
+            enemy = en;
         }
 
         // second constructor for if the sprite is a single texture
@@ -177,6 +179,9 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
                 }
                 projcount++;
             }
+
+            if (Health == 0) ;
+                
 
         }
 

@@ -17,11 +17,12 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
     {
         public Squared.Tiled.Object mapobj;
         public Timer deathtimer;
-        Texture2D Blank;
+        public Texture2D Blank;
+        public bool enemy;
 
         public bool active = false;
         // constructor to pass everything to sprite bas class
-        public Projectile(Texture2D texture, Texture2D blank,Vector2 pos, Vector2 move, Squared.Tiled.Object obj) : base(texture,null)
+        public Projectile(Texture2D texture, Texture2D blank,Vector2 pos, Vector2 move, Squared.Tiled.Object obj, bool en) : base(texture,null)
         {
             active = true;
             Blank = blank;
@@ -32,6 +33,7 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
             deathtimer.Interval = 3000;
             deathtimer.Elapsed += new ElapsedEventHandler(OnFireTimedEvent);
             deathtimer.Enabled = true;
+            enemy = en;
         }
         private void OnFireTimedEvent(object source, ElapsedEventArgs e)
         {
