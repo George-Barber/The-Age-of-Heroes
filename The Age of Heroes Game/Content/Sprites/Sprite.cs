@@ -127,8 +127,8 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
             if (health)
             {
                 Health = 5;
-                HealthMax = 5;
-                HealthBar = new Rectangle(0, 0, 27/HealthMax*Health, 5);
+                HealthMax = 10;
+                HealthBar = new Rectangle(0, 0, 30/HealthMax*Health, 5);
             }
             PlayerProjectiles = new List<Projectile>();
             // setup animations
@@ -180,7 +180,11 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
                 projcount++;
             }
 
-            if (Health == 0) ;
+            if (Health <= 0)
+            {
+                Console.WriteLine("DEAD" + Health);
+            }
+        
                 
 
         }

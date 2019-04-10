@@ -116,6 +116,10 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
             if(Velocity!=Vector2.Zero)
                 _animationManager.Update(gameTime);
             Velocity = Vector2.Zero;
+            if (Health <= 0)
+            {
+                Console.WriteLine("DEAD" + Health);
+            }
         }
     }
 }
