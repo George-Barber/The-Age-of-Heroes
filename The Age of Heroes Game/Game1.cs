@@ -322,7 +322,7 @@ namespace The_Age_of_Heroes_Game
                         foreach (Enemy E in EnemyList)
                         {
                             Rectangle Erec = new Rectangle((int)E.mapobj.X, (int)E.mapobj.Y, E.mapobj.Width, E.mapobj.Height);
-                            if (proj.Intersects(Erec) && P.active)
+                            if (proj.Intersects(Erec))
                             {
                                 E.Health -= 1;
                                 P.mapobj.Texture= P.Blank;

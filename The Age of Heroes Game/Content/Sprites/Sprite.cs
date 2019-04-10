@@ -169,7 +169,7 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
                 _animationManager.Update(gameTime);
             OldVelocity = Velocity;
             Velocity = Vector2.Zero;
-
+            //sets projectiles
             int projcount = 0;
             foreach (Projectile proj in PlayerProjectiles)
             {
