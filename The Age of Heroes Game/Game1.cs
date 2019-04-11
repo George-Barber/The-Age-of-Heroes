@@ -322,10 +322,10 @@ namespace The_Age_of_Heroes_Game
                         foreach (Enemy E in EnemyList)
                         {
                             Rectangle Erec = new Rectangle((int)E.mapobj.X, (int)E.mapobj.Y, E.mapobj.Width, E.mapobj.Height);
-                            if (proj.Intersects(Erec))
+                            if (proj.Intersects(Erec) && P.active)
                             {
                                 E.Health -= 1;
-                                P.mapobj.Texture= P.Blank;
+                                P.mapobj.Texture = P.Blank;
                                 P.active = false;
                                 Console.WriteLine("shot: " + proj + " -- " + Erec + " -- " + E.Health);
                             }
@@ -337,47 +337,75 @@ namespace The_Age_of_Heroes_Game
                 int i = 1;
                 foreach (Enemy E in EnemyList)
                 {
-                    // get position of enemy
-                    Vector2 temp = E.Position;
-
-                    // update the enemy to move
-                    E.Update(gameTime, Position);
-
-                    // check for enemy collision between the bounds and other enemies
-                    if (CheckBounds(map.ObjectGroups["Objects"].Objects["Enemy" + i]) || CheckEnemy(map.ObjectGroups["Objects"].Objects["Enemy" + i], E))
+                    if (E.Health > 0)
                     {
-                        // collision so set position back to temp value
-                        E.Position = temp;
-                    }
-                    else
-                    {
-                        // no collision so update the enemy position in map
-                        map.ObjectGroups["Objects"].Objects["Enemy" + i].X = (int)E.Position.X;
-                        map.ObjectGroups["Objects"].Objects["Enemy" + i].Y = (int)E.Position.Y;
+                        // get position of enemy
+                        Vector2 temp = E.Position;
 
-                        if (true)
+                        // update the enemy to move
+                        E.Update(gameTime, Position);
+
+                        foreach (Projectile P in E.PlayerProjectiles)
                         {
-                            Squared.Tiled.Object tempp = new Squared.Tiled.Object();
-                            tempp.X = (int)E.Position.X;
-                            tempp.Y = (int)E.Position.Y;
-                            tempp.Width = 30;
-                            tempp.Height = 30;
-                            tempp.Type = "proj";
-                            tempp.Texture = projTexture;
-                            if (E.Fire(E.Position, tempp, blankTexture))
+                            Rectangle proj = new Rectangle((int)P.Position.X, (int)P.Position.Y, P.mapobj.Width, P.mapobj.Height);
+                            Squared.Tiled.Object obj = map.ObjectGroups["Objects"].Objects["Player"];
+                            Rectangle objrec = new Rectangle(
+                                 obj.X,
+                                 obj.Y,
+                                 obj.Width,
+                                 obj.Height
+                                 );
+                            if (proj.Intersects(objrec) && P.active)
+                                {
+                                    _sprites[0].Health -= 1;
+                                    P.mapobj.Texture = P.Blank;
+                                    P.active = false;
+                                }
+
+                        }
+
+                        // check for enemy collision between the bounds and other enemies
+                        if (CheckBounds(map.ObjectGroups["Objects"].Objects["Enemy" + i]) || CheckEnemy(map.ObjectGroups["Objects"].Objects["Enemy" + i], E))
+                        {
+                            // collision so set position back to temp value
+                            E.Position = temp;
+                        }
+                        else
+                        {
+                            // no collision so update the enemy position in map
+                            map.ObjectGroups["Objects"].Objects["Enemy" + i].X = (int)E.Position.X;
+                            map.ObjectGroups["Objects"].Objects["Enemy" + i].Y = (int)E.Position.Y;
+
+                            if (true)
                             {
-                                map.ObjectGroups["Objects"].Objects.Add("proj" + projcount, tempp);
-                                projcount++;
+                                Squared.Tiled.Object tempp = new Squared.Tiled.Object();
+                                tempp.X = (int)E.Position.X;
+                                tempp.Y = (int)E.Position.Y;
+                                tempp.Width = 30;
+                                tempp.Height = 30;
+                                tempp.Type = "proj";
+                                tempp.Texture = projTexture;
+                                if (E.Fire(E.Position, tempp, blankTexture))
+                                {
+                                    map.ObjectGroups["Objects"].Objects.Add("proj" + projcount, tempp);
+                                    projcount++;
+                                }
                             }
                         }
-                    }
-                    i++;
-                }
+                        i++;
 
+                    }
+                }
 
 
                 viewportPosition = new Vector2(map.ObjectGroups["Objects"].Objects["Player"].X, map.ObjectGroups["Objects"].Objects["Player"].Y);
                 KeyboardState keys = Keyboard.GetState();
+                 
+                if (_sprites[0].Health <= 0)
+                {
+                    currentScreen = Menu.Main;
+                    LoadContent();
+                }
                 // Takes to main menu or inventory
                 if (keys.IsKeyDown(Keys.Tab))
                 {

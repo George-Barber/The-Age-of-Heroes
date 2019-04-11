@@ -126,9 +126,9 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
             // setup health
             if (health)
             {
-                Health = 5;
-                HealthMax = 5;
-                HealthBar = new Rectangle(0, 0, 27/HealthMax*Health, 5);
+                Health = 10;
+                HealthMax = 10;
+                HealthBar = new Rectangle(0, 0, 30/HealthMax*Health, 5);
             }
             PlayerProjectiles = new List<Projectile>();
             // setup animations
@@ -161,6 +161,8 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
             Position += Velocity;
 
             //set health bar position
+
+            HealthBar = new Rectangle(0, 0, 30 / HealthMax * Health, 5);
             HealthBar.X = (int)Position.X - (int)vp.X;
             HealthBar.Y = (int)Position.Y - (int)vp.Y + 80;
 
@@ -180,7 +182,11 @@ namespace The_Age_of_Heroes_Game.Content.Sprites
                 projcount++;
             }
 
-            if (Health == 0) ;
+            if (Health <= 0)
+            {
+                Console.WriteLine("DEAD" + Health);
+            }
+        
                 
 
         }
