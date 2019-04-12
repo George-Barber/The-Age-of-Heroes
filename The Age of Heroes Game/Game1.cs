@@ -863,6 +863,23 @@ namespace The_Age_of_Heroes_Game
                         // the map and exit are separated by :
                         string[] parts = location.Split(':');
 
+                        // set the right map
+                        switch (parts[0])
+                        {
+                            case "Map1":
+                                CurrentMap = map1;
+                                break;
+                            case "Map2":
+                                CurrentMap = map2;
+                                break;
+                            case "Map3":
+                                CurrentMap = map3;
+                                break;
+                            case "Map4":
+                                CurrentMap = map4;
+                                break;
+                        }
+
                         // move player to exit location on this map
                         CurrentMap.ObjectGroups["Objects"].Objects["Player"].X = CurrentMap.ObjectGroups["Objects"].Objects[parts[1]].X;
                         CurrentMap.ObjectGroups["Objects"].Objects["Player"].Y = CurrentMap.ObjectGroups["Objects"].Objects[parts[1]].Y;
