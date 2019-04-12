@@ -30,11 +30,12 @@ namespace The_Age_of_Heroes_Game
         private Texture2D coinTexture;
         private Texture2D projTexture;
         private Texture2D menuBackground;
-        private readonly Texture2D keyTexture;
+        private Texture2D keyTexture;
         List<Squared.Tiled.Object> Inventory;
         public List<Enemy> EnemyList;
         //public List<Projectile> PlayerProjectiles;
         int coin_collected = 0;
+        bool key_collected = false;
         SimpleTextUI menu;
         SimpleTextUI inventory;
         SimpleTextUI options;
@@ -126,6 +127,7 @@ namespace The_Age_of_Heroes_Game
 
             // texture for coin ojects, blank once collected
             coinTexture = Content.Load<Texture2D>("coinTexture");
+            keyTexture = Content.Load<Texture2D>("coinTexture");
             projTexture = Content.Load<Texture2D>("Magic");
             blankTexture = Content.Load<Texture2D>("Transparent");
             menuBackground = Content.Load<Texture2D>("Age Of Heroes Menu");
@@ -219,7 +221,7 @@ namespace The_Age_of_Heroes_Game
             {
                 map.ObjectGroups["Objects"].Objects["Coin" + i].Texture = coinTexture;
             }
-
+            map.ObjectGroups["Objects"].Objects["Key"].Texture = keyTexture;
             // get enemy count
             int EnemyCount = Convert.ToInt32(map.ObjectGroups["Objects"].Properties["Enemy_Count"]);
             
@@ -310,13 +312,15 @@ namespace The_Age_of_Heroes_Game
                 Rectangle playerRec = new Rectangle(p.X, p.Y, p.Width, p.Height);
                 CheckCoins(playerRec);
                 CheckExits(playerRec);
+                CheckKey(playerRec);
+                CheckEnd(playerRec);
 
                 // update player object with position and viewport
                 Vector2 Test = (viewportPosition + new Vector2(0, 100) - new Vector2((graphics.PreferredBackBufferWidth / 2), (graphics.PreferredBackBufferHeight / 2)));
                 foreach (var sprite in _sprites)
                 {
                     sprite.Update(gameTime, Position, Test);
-                    foreach(Projectile P in sprite.PlayerProjectiles)
+                    foreach (Projectile P in sprite.PlayerProjectiles)
                     {
                         Rectangle proj = new Rectangle((int)P.Position.X, (int)P.Position.Y, P.mapobj.Width, P.mapobj.Height);
                         foreach (Enemy E in EnemyList)
@@ -356,11 +360,11 @@ namespace The_Age_of_Heroes_Game
                                  obj.Height
                                  );
                             if (proj.Intersects(objrec) && P.active)
-                                {
-                                    _sprites[0].Health -= 1;
-                                    P.mapobj.Texture = P.Blank;
-                                    P.active = false;
-                                }
+                            {
+                                _sprites[0].Health -= 1;
+                                P.mapobj.Texture = P.Blank;
+                                P.active = false;
+                            }
 
                         }
 
@@ -400,7 +404,7 @@ namespace The_Age_of_Heroes_Game
 
                 viewportPosition = new Vector2(map.ObjectGroups["Objects"].Objects["Player"].X, map.ObjectGroups["Objects"].Objects["Player"].Y);
                 KeyboardState keys = Keyboard.GetState();
-                 
+
                 if (_sprites[0].Health <= 0)
                 {
                     currentScreen = Menu.Main;
@@ -414,6 +418,15 @@ namespace The_Age_of_Heroes_Game
                 else if (keys.IsKeyDown(Keys.I))
                 {
                     currentScreen = Menu.Inventory;
+                    string temp = "No";
+                    if (key_collected)
+                        temp = "Yes";
+                    inventory = new SimpleTextUI(this, big, new[] { "Coins: "+ coin_collected, "Items", "Key: " + temp, "Exit" })
+                    {
+                        TextColor = Color.Black,
+                        SelectedElement = new TextElement(">", Color.White),
+                        Align = Alignment.Left
+                    };
                     current = inventory;
                 }
             }
@@ -482,9 +495,44 @@ namespace The_Age_of_Heroes_Game
             }
             else if (currentScreen == Menu.Inventory)
             {
+                KeyboardState keys = Keyboard.GetState();
+                bool change = true;
 
+                if (!keytimer.Enabled)
+                {
+                    if (keys.IsKeyDown(Keys.Up))
+                    {
+                        current.Move(Direction.Up);
+                    }
+
+                    else if (keys.IsKeyDown(Keys.Down))
+                    {
+                        current.Move(Direction.Down);
+                    }
+                    else if (keys.IsKeyDown(Keys.Enter))
+                    {
+                        string test = current.GetCurrentCaption();
+
+                        if (current == inventory)
+                        {
+                            if (test == "Exit")
+                                currentScreen = Menu.Play;
+                        }
+
+                    }
+                }
+                else
+                    change = false;
+
+                if (change)
+                {
+                    keytimer = new Timer();
+                    keytimer.Interval = 200;
+                    keytimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
+                    keytimer.Enabled = true;
+                }
             }
-                base.Update(gameTime);
+            base.Update(gameTime);
         }
 
         // timed event to control key presses
@@ -529,9 +577,10 @@ namespace The_Age_of_Heroes_Game
                 {
                     sprite.Draw(spriteBatch, viewportPosition + new Vector2(0, 100) - new Vector2((graphics.PreferredBackBufferWidth / 2), (graphics.PreferredBackBufferHeight / 2)), true);
                 }
-
-                // draw foreground layer
+                // draw foreground layers
                 map.Layers["DTile Layer 1"].Draw(spriteBatch,map.Tilesets.Values, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), viewportPosition - new Vector2((graphics.PreferredBackBufferWidth / 2), (graphics.PreferredBackBufferHeight / 2)),tilepixel,tilepixel);
+                spriteBatch.DrawString(big, " " + "Coins collected: " + (coin_collected), new Vector2(1, 1), Color.Black);
+                spriteBatch.DrawString(big, " " + "Coins collected: " + (coin_collected), new Vector2(0, 0), Color.DarkGoldenrod);
                 spriteBatch.End();
             }
             else
@@ -540,7 +589,6 @@ namespace The_Age_of_Heroes_Game
                 spriteBatch.Begin();
                 spriteBatch.Draw(menuBackground, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), Color.White);
                 spriteBatch.End();
-
                 current.Draw(gameTime);
             }
             
@@ -712,11 +760,33 @@ namespace The_Age_of_Heroes_Game
             }
 
         }
+        public void CheckKey(Rectangle player)
+        {
 
+                // get the key
+                var key = map.ObjectGroups["Objects"].Objects["Key"];
+
+                // if the texture is not blank it can be collected
+                if (key.Texture != blankTexture)
+                {
+                    // get rectangle for key
+                    Rectangle keyRec = new Rectangle(key.X, key.Y, key.Width, key.Height);
+
+                    // check to see if it intersects with player
+                    if (player.Intersects(keyRec))
+                    {
+                        // add to inventory
+                        Inventory.Add(key);
+                        key_collected = true;
+                        key.Texture = blankTexture;
+                    }
+                }
+        }
         public void CheckExits(Rectangle player)
         {
             // get number of exits from the current map
             int exitCount = Convert.ToInt32(map.ObjectGroups["Objects"].Properties["Exit_Count"]);
+
 
             // loop to check each exit
             for (int i = 1; i <= exitCount; i++)
@@ -763,6 +833,90 @@ namespace The_Age_of_Heroes_Game
                     exittimer.Elapsed += new ElapsedEventHandler(OnExitTimedEvent);
                     exittimer.Enabled = true;
 
+                }
+            }
+        }
+        public void CheckDoor(Rectangle player)
+        {
+
+            if (coin_collected >= 10)
+            {
+                // get number of exits from the current map
+                int doorCount = Convert.ToInt32(map.ObjectGroups["Objects"].Properties["Door_Count"]);
+
+
+                // loop to check each exit
+                for (int i = 1; i <= doorCount; i++)
+                {
+                    // gets exit object from map
+                    var exit = map.ObjectGroups["Objects"].Objects["Door" + i];
+
+                    // creates rectangle for exit
+                    Rectangle exitRec = new Rectangle(exit.X, exit.Y, exit.Width, exit.Height);
+
+                    // check for intersect with player, timer to stop constant jumping 
+                    if (player.Intersects(exitRec) && !exittimer.Enabled)
+                    {
+                        // location is stored in the type field of the object
+                        string location = exit.Type;
+
+                        // the map and exit are separated by :
+                        string[] parts = location.Split(':');
+
+                        // move player to exit location on this map
+                        CurrentMap.ObjectGroups["Objects"].Objects["Player"].X = CurrentMap.ObjectGroups["Objects"].Objects[parts[1]].X;
+                        CurrentMap.ObjectGroups["Objects"].Objects["Player"].Y = CurrentMap.ObjectGroups["Objects"].Objects[parts[1]].Y;
+
+                        // set timer so you can't jump for 1 second
+                        exittimer = new Timer();
+                        exittimer.Interval = 1000;
+                        exittimer.Elapsed += new ElapsedEventHandler(OnExitTimedEvent);
+                        exittimer.Enabled = true;
+
+                    }
+                }
+            }
+        }
+        public void CheckEnd(Rectangle player)
+        {
+            if (key_collected)
+            {
+
+                // gets exit object from map
+                var exit = map.ObjectGroups["Objects"].Objects["End1"];
+
+                // creates rectangle for exit
+                Rectangle exitRec = new Rectangle(exit.X, exit.Y, exit.Width, exit.Height);
+
+                // check for intersect with player, timer to stop constant jumping 
+                if (player.Intersects(exitRec) && !exittimer.Enabled)
+                {
+
+                    CurrentMap.ObjectGroups["Objects"].Objects["Player"].X = CurrentMap.ObjectGroups["Objects"].Objects["End2"].X + (CurrentMap.ObjectGroups["Objects"].Objects["End2"].Width / 2)-(player.Width/2);
+                    CurrentMap.ObjectGroups["Objects"].Objects["Player"].Y = CurrentMap.ObjectGroups["Objects"].Objects["End2"].Y + (CurrentMap.ObjectGroups["Objects"].Objects["End2"].Height / 2) ;
+                    // set timer so you can't jump for 1 second
+                    exittimer = new Timer();
+                    exittimer.Interval = 1000;
+                    exittimer.Elapsed += new ElapsedEventHandler(OnExitTimedEvent);
+                    exittimer.Enabled = true;
+                }
+
+                exit = map.ObjectGroups["Objects"].Objects["End2"];
+
+                // creates rectangle for exit
+                exitRec = new Rectangle(exit.X, exit.Y, exit.Width, exit.Height);
+
+                // check for intersect with player, timer to stop constant jumping 
+                if (player.Intersects(exitRec) && !exittimer.Enabled)
+                {
+                    CurrentMap.ObjectGroups["Objects"].Objects["Player"].X = CurrentMap.ObjectGroups["Objects"].Objects["End1"].X+(CurrentMap.ObjectGroups["Objects"].Objects["End1"].Width/2)-(player.Width / 2);
+                    CurrentMap.ObjectGroups["Objects"].Objects["Player"].Y = CurrentMap.ObjectGroups["Objects"].Objects["End1"].Y+ (CurrentMap.ObjectGroups["Objects"].Objects["End1"].Height / 2);
+
+                    // set timer so you can't jump for 1 second
+                    exittimer = new Timer();
+                    exittimer.Interval = 1000;
+                    exittimer.Elapsed += new ElapsedEventHandler(OnExitTimedEvent);
+                    exittimer.Enabled = true;
                 }
             }
         }
