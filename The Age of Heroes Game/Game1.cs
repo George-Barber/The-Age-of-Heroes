@@ -195,7 +195,7 @@ namespace The_Age_of_Heroes_Game
                 new TextElement("Back")
             });
 
-            inventory = new SimpleTextUI(this, big, new[] { "Coins", "Items", "Keys", "Exit" })
+            inventory = new SimpleTextUI(this, big, new[] { "Coins", "Keys", "Exit" })
             {
                 TextColor = Color.Black,
                 SelectedElement = new TextElement(">", Color.White),
@@ -314,6 +314,7 @@ namespace The_Age_of_Heroes_Game
                 CheckExits(playerRec);
                 CheckKey(playerRec);
                 CheckEnd(playerRec);
+                CheckDoor(playerRec);
 
                 // update player object with position and viewport
                 Vector2 Test = (viewportPosition + new Vector2(0, 100) - new Vector2((graphics.PreferredBackBufferWidth / 2), (graphics.PreferredBackBufferHeight / 2)));
@@ -421,7 +422,7 @@ namespace The_Age_of_Heroes_Game
                     string temp = "No";
                     if (key_collected)
                         temp = "Yes";
-                    inventory = new SimpleTextUI(this, big, new[] { "Coins: "+ coin_collected, "Items", "Key: " + temp, "Exit" })
+                    inventory = new SimpleTextUI(this, big, new[] { "Coins: "+ coin_collected, "Key: " + temp, "Exit" })
                     {
                         TextColor = Color.Black,
                         SelectedElement = new TextElement(">", Color.White),
@@ -843,7 +844,6 @@ namespace The_Age_of_Heroes_Game
             {
                 // get number of exits from the current map
                 int doorCount = Convert.ToInt32(map.ObjectGroups["Objects"].Properties["Door_Count"]);
-
 
                 // loop to check each exit
                 for (int i = 1; i <= doorCount; i++)
