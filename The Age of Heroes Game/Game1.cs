@@ -454,6 +454,25 @@ namespace The_Age_of_Heroes_Game
                     {
                         current.Move(Direction.Down);
                     }
+                    else if (keys.IsKeyDown(Keys.Left))
+                    {
+                        current.Move(Direction.Left);
+                        if (current.GetCurrentCaption() == "Video")
+                        {
+                            graphics.IsFullScreen = (current.GetCurrentValue() == "FullScreen");
+                            graphics.ApplyChanges();
+                        }
+                    }
+
+                    else if (keys.IsKeyDown(Keys.Right))
+                    {
+                        current.Move(Direction.Right);
+                        if (current.GetCurrentCaption() == "Video")
+                        {
+                            graphics.IsFullScreen = (current.GetCurrentValue() == "FullScreen");
+                            graphics.ApplyChanges();
+                        }
+                    }
                     else if (keys.IsKeyDown(Keys.Enter))
                     {
                         string test = current.GetCurrentCaption();
@@ -492,10 +511,6 @@ namespace The_Age_of_Heroes_Game
                         
                         else if (current == options)
                         {
-                            if (test == "FullScreen")
-                            {
-                                graphics.ToggleFullScreen();
-                            }
                         }
                     }
                     else
