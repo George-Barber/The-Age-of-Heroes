@@ -39,6 +39,7 @@ namespace The_Age_of_Heroes_Game
         SimpleTextUI menu;
         SimpleTextUI inventory;
         SimpleTextUI options;
+        SimpleTextUI credits;
         SimpleTextUI current;
         SpriteFont big;
         SpriteFont small;
@@ -91,7 +92,7 @@ namespace The_Age_of_Heroes_Game
             Main,
             Play,
             Options,
-            Gameover,
+            Credits,
             Inventory
         }
         Menu currentScreen = Menu.Main;
@@ -194,7 +195,12 @@ namespace The_Age_of_Heroes_Game
                 new NumericElement("Music",1,3,0f,10f,1f),
                 new TextElement("Back")
             });
-
+            credits = new SimpleTextUI(this, big, new[] { "By The Great", "George", "Barber", "Back" })
+            {
+                TextColor = Color.Black,
+                SelectedElement = new TextElement(">", Color.White),
+                Align = Alignment.Left
+            };
             inventory = new SimpleTextUI(this, big, new[] { "Coins", "Keys", "Exit" })
             {
                 TextColor = Color.Black,
@@ -464,10 +470,12 @@ namespace The_Age_of_Heroes_Game
                             {
                                 currentScreen = Menu.Play;
                             }
-
+                            else if (test == "Credits")
+                            {
+                                current = credits;
+                            }
                         }
-
-                        else if (current == options)
+                        else if (current == credits)
                         {
                             if (test == "Back")
                             {
@@ -476,9 +484,17 @@ namespace The_Age_of_Heroes_Game
                         }
                         else if (current == options)
                         {
+                            if (test == "Back")
+                            {
+                                current = menu;
+                            }
+                        }
+                        
+                        else if (current == options)
+                        {
                             if (test == "FullScreen")
                             {
-                                graphics.IsFullScreen = false;
+                                graphics.ToggleFullScreen();
                             }
                         }
                     }
