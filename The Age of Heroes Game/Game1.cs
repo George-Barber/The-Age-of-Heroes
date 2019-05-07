@@ -9,6 +9,7 @@ using The_Age_of_Heroes_Game.Content.Sprites;
 using The_Age_of_Heroes_Game.Content.Models;
 using A1r.SimpleTextUI;
 using System.Timers;
+using Microsoft.Xna.Framework.Media;
 
 namespace The_Age_of_Heroes_Game
 {
@@ -36,6 +37,8 @@ namespace The_Age_of_Heroes_Game
         //public List<Projectile> PlayerProjectiles;
         int coin_collected = 0;
         bool key_collected = false;
+        bool songplaying = false;
+        Song backsong;
         SimpleTextUI menu;
         SimpleTextUI inventory;
         SimpleTextUI options;
@@ -46,6 +49,7 @@ namespace The_Age_of_Heroes_Game
         Timer keytimer;
         Timer exittimer;
         int projcount = 0;
+
 
         // property to handle changing maps
         public Map CurrentMap
@@ -128,7 +132,7 @@ namespace The_Age_of_Heroes_Game
 
             // texture for coin ojects, blank once collected
             coinTexture = Content.Load<Texture2D>("coinTexture");
-            keyTexture = Content.Load<Texture2D>("coinTexture");
+            keyTexture = Content.Load<Texture2D>("key");
             projTexture = Content.Load<Texture2D>("Magic");
             blankTexture = Content.Load<Texture2D>("Transparent");
             menuBackground = Content.Load<Texture2D>("Age Of Heroes Menu");
@@ -291,6 +295,16 @@ namespace The_Age_of_Heroes_Game
         {
             if (currentScreen == Menu.Play)
             {
+                if (songplaying == false)
+                {
+                    backsong = Content.Load<Song>("Game of Thrones");
+                    MediaPlayer.Play(backsong);
+                    songplaying = true;
+                }
+                else if (MediaPlayer.State == MediaState.Stopped)
+                {
+                    songplaying = false;
+                }
                 if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                     Exit();
                 clean();
@@ -508,10 +522,7 @@ namespace The_Age_of_Heroes_Game
                                 current = menu;
                             }
                         }
-                        
-                        else if (current == options)
-                        {
-                        }
+                       
                     }
                     else
                         change = false;
@@ -894,23 +905,6 @@ namespace The_Age_of_Heroes_Game
                         // the map and exit are separated by :
                         string[] parts = location.Split(':');
 
-                        // set the right map
-                        switch (parts[0])
-                        {
-                            case "Map1":
-                                CurrentMap = map1;
-                                break;
-                            case "Map2":
-                                CurrentMap = map2;
-                                break;
-                            case "Map3":
-                                CurrentMap = map3;
-                                break;
-                            case "Map4":
-                                CurrentMap = map4;
-                                break;
-                        }
-
                         // move player to exit location on this map
                         CurrentMap.ObjectGroups["Objects"].Objects["Player"].X = CurrentMap.ObjectGroups["Objects"].Objects[parts[1]].X;
                         CurrentMap.ObjectGroups["Objects"].Objects["Player"].Y = CurrentMap.ObjectGroups["Objects"].Objects[parts[1]].Y;
@@ -920,6 +914,7 @@ namespace The_Age_of_Heroes_Game
                         exittimer.Interval = 1000;
                         exittimer.Elapsed += new ElapsedEventHandler(OnExitTimedEvent);
                         exittimer.Enabled = true;
+                        coin_collected -= 5;
 
                     }
                 }
