@@ -539,3 +539,9 @@
 /processorParam:TextureFormat=Color
 /build:humans/Riding.png
 
+#begin Game of Thrones.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Game of Thrones.mp3
+
