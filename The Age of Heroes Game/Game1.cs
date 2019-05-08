@@ -205,7 +205,7 @@ namespace The_Age_of_Heroes_Game
                 SelectedElement = new TextElement(">", Color.White),
                 Align = Alignment.Left
             };
-            inventory = new SimpleTextUI(this, big, new[] { "Coins", "Keys", "Exit" })
+            inventory = new SimpleTextUI(this, big, new[] { "Coins", "Keys", "Back" })
             {
                 TextColor = Color.Black,
                 SelectedElement = new TextElement(">", Color.White),
@@ -442,7 +442,7 @@ namespace The_Age_of_Heroes_Game
                     string temp = "No";
                     if (key_collected)
                         temp = "Yes";
-                    inventory = new SimpleTextUI(this, big, new[] { "Coins: "+ coin_collected, "Key: " + temp, "Exit" })
+                    inventory = new SimpleTextUI(this, big, new[] { "Coins: "+ coin_collected, "Key: " + temp, "Back" })
                     {
                         TextColor = Color.Black,
                         SelectedElement = new TextElement(">", Color.White),
@@ -558,7 +558,7 @@ namespace The_Age_of_Heroes_Game
 
                         if (current == inventory)
                         {
-                            if (test == "Exit")
+                            if (test == "Back")
                                 currentScreen = Menu.Play;
                         }
 
